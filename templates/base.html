@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Spotify - Web Player{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --spotify-green: #1DB954;
+            --spotify-black: #000000;
+            --spotify-dark-grey: #121212;
+            --spotify-elevated-grey: #242424;
+            --spotify-card-grey: #181818;
+            --spotify-light-grey: #b3b3b3;
+            --spotify-white: #ffffff;
+            --sidebar-width: 280px;
+            --right-sidebar-width: 320px;
+        }
+
+        body {
+            font-family: 'Circular', 'Segoe UI', Roboto, sans-serif;
+            background-color: black;
+            color: var(--spotify-white);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            letter-spacing: -0.02em;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #5a5a5a; }
+        ::-webkit-scrollbar-thumb:hover { background: #888; }
+
+        /* Top Bar */
+        .top-bar {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .top-bar-left { width: var(--sidebar-width); display: flex; align-items: center; }
+
+        .top-bar-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .home-btn {
+            width: 48px;
+            height: 48px;
+            background-color: #1f1f1f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s;
+        }
+        .home-btn:hover { transform: scale(1.05); background-color: #2a2a2a; }
+
+        .search-pill {
+            background-color: #1f1f1f;
+            border-radius: 500px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            width: 480px;
+            height: 48px;
+            box-sizing: border-box;
+            border: 1px solid transparent;
+            transition: border 0.2s;
+        }
+        .search-pill:hover { background-color: #2a2a2a; border-color: #404040; }
+        .search-pill input {
+            background: none; border: none; color: white; width: 100%; font-size: 16px; outline: none; padding: 0 12px;
+        }
+
+        .top-bar-right { display: flex; align-items: center; gap: 16px; }
+
+        /* Buttons */
+        .btn-pill {
+            border-radius: 500px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; padding: 8px 16px; transition: transform 0.1s;
+        }
+        .btn-pill:hover { transform: scale(1.04); }
+        .btn-white { background-color: white; color: black; }
+        .btn-green { background-color: var(--spotify-green); color: black; }
+        .btn-outline { background: none; border: 1px solid #727272; color: white; }
+
+        /* Layout */
+        .layout-main { display: flex; flex: 1; padding: 0 8px 8px 8px; gap: 8px; overflow: hidden; }
+
+        /* Sidebars */
+        .sidebar-container {
+            width: var(--sidebar-width); background-color: var(--spotify-dark-grey); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .right-sidebar {
+            width: var(--right-sidebar-width); background-color: var(--spotify-dark-grey); border-radius: 8px; display: flex; flex-direction: column; padding: 16px; box-sizing: border-box; overflow-y: auto;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1; background-color: var(--spotify-dark-grey); border-radius: 8px; overflow-y: auto; background-image: linear-gradient(to bottom, #222 0%, #121212 400px);
+        }
+        .content-padding { padding: 24px 32px 120px 32px; }
+
+        /* Section Header */
+        .section-container { position: relative; margin-bottom: 32px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 0 0 16px 0; }
+        .section-header h2 { font-size: 24px; font-weight: 700; margin: 0; cursor: pointer; }
+        .section-header h2:hover { text-decoration: underline; }
+
+        .carousel-wrapper { position: relative; }
+
+        /* Card Grid & Cards */
+        .card-grid {
+            display: flex; gap: 24px; overflow-x: auto; padding-bottom: 12px; scroll-behavior: smooth; scrollbar-width: none;
+        }
+        .card-grid::-webkit-scrollbar { display: none; }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            border: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.2s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        .carousel-wrapper:hover .nav-arrow { opacity: 1; }
+        .nav-arrow:hover { transform: translateY(-50%) scale(1.1); background-color: rgba(0,0,0,0.9); }
+        .nav-prev { left: -20px; }
+        .nav-next { right: -20px; }
+
+        .card {
+            flex: 0 0 180px; padding: 16px; background-color: var(--spotify-card-grey); border-radius: 8px; transition: background-color 0.3s; cursor: pointer; position: relative;
+        }
+        .card:hover { background-color: var(--spotify-elevated-grey); }
+
+        .card img {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .play-overlay {
+            position: absolute; right: 24px; bottom: 80px; width: 48px; height: 48px; background-color: var(--spotify-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 20px; opacity: 0; transform: translateY(8px); transition: all 0.3s ease; box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        .card:hover .play-overlay { opacity: 1; transform: translateY(0); }
+
+        .card h3 { font-size: 16px; font-weight: 700; margin: 0 0 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { font-size: 14px; color: var(--spotify-light-grey); margin: 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Shortcuts Grid */
+        .shortcuts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 32px; }
+        .shortcut-card {
+            height: 48px; background-color: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; overflow: hidden; cursor: pointer; transition: background-color 0.3s;
+        }
+        .shortcut-card:hover { background-color: rgba(255,255,255,0.2); }
+        .shortcut-card img { width: 48px; height: 48px; object-fit: cover; }
+        .shortcut-card span { padding: 0 12px; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Player Bar */
+        .player-bar {
+            height: 90px; background-color: black; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
+        }
+        .player-bar-left { width: 30%; display: flex; align-items: center; gap: 14px; }
+        .player-bar-center { width: 40%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .player-bar-right { width: 30%; display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+
+        .progress-container { width: 100%; height: 4px; background-color: #4d4d4d; border-radius: 2px; position: relative; }
+        .progress-fill { height: 100%; background-color: white; border-radius: 2px; }
+        .progress-container:hover { height: 6px; }
+        .progress-container:hover .progress-fill { background-color: var(--spotify-green); }
+
+        /* Profile Dropdown */
+        .profile-container { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 48px; right: 0; width: 200px; background-color: #282828; border-radius: 4px; padding: 4px; display: none; flex-direction: column; box-shadow: 0 16px 24px rgba(0,0,0,0.5); z-index: 5000;
+        }
+        .dropdown-menu.show { display: flex; }
+        .dropdown-item {
+            padding: 12px; color: #e2e2e2; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; border-radius: 2px;
+        }
+        .dropdown-item:hover { background-color: hsla(0,0%,100%,.1); color: white; }
+
+        .show-all { color: var(--spotify-light-grey); font-size: 14px; font-weight: 700; text-decoration: none; }
+        .show-all:hover { text-decoration: underline; }
+    </style>
+    <audio id="main-audio-player" style="display: none;"></audio>
+    <script>
+        const audioPlayer = document.getElementById('main-audio-player');
+        let isPlaying = false;
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            document.getElementById('profile-dropdown').classList.toggle('show');
+        }
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-trigger')) {
+                const d = document.getElementById('profile-dropdown');
+                if (d && d.classList.contains('show')) d.classList.remove('show');
+            }
+        }
+        function playSong(title, artist, imgUrl, audioUrl) {
+            document.getElementById('player-title').innerText = title;
+            document.getElementById('player-artist').innerText = artist;
+            document.getElementById('player-img').src = imgUrl;
+            
+            // Lógica de áudio real
+            if (audioUrl && audioUrl !== 'None' && audioUrl !== '') {
+                audioPlayer.src = audioUrl;
+                audioPlayer.play().catch(e => console.error("Erro ao tocar:", e));
+                isPlaying = true;
+                updatePlayIcons(true);
+            } else {
+                alert("Esta música não possui um arquivo de áudio cadastrado.");
+            }
+
+            if(document.getElementById('right-sidebar')) {
+                document.getElementById('right-title').innerText = title;
+                document.getElementById('right-artist').innerText = artist;
+                document.getElementById('right-img').src = imgUrl;
+            }
+        }
+
+        function togglePlay() {
+            if (!audioPlayer.src) return;
+            if (isPlaying) {
+                audioPlayer.pause();
+            } else {
+                audioPlayer.play();
+            }
+            isPlaying = !isPlaying;
+            updatePlayIcons(isPlaying);
+        }
+
+        function updatePlayIcons(playing) {
+            const playIcons = document.querySelectorAll('.fa-play-circle');
+            playIcons.forEach(icon => {
+                if (playing) {
+                    icon.classList.replace('fa-play-circle', 'fa-pause-circle');
+                } else {
+                    icon.classList.replace('fa-pause-circle', 'fa-play-circle');
+                }
+            });
+        }
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            const progressFill = document.querySelector('.progress-fill');
+            if (progressFill) progressFill.style.width = progress + '%';
+        });
+
+        function scrollCarousel(id, dir) {
+            const c = document.getElementById(id);
+            if(c) c.scrollBy({ left: dir * c.offsetWidth * 0.8, behavior: 'smooth' });
+        }
+    </script>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left"><i class="fab fa-spotify" style="font-size: 32px;"></i></div>
+        <div class="top-bar-center">
+            <button class="home-btn" onclick="location.href='{% url 'index' %}'"><i class="fas fa-home"></i></button>
+            <div class="search-pill">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="O que você quer ouvir?">
+            </div>
+        </div>
+        <div class="top-bar-right">
+            {% if user.is_authenticated %}
+                <button class="btn-pill btn-white">Ver planos Premium</button>
+                <div style="display: flex; gap: 16px; align-items: center; color: var(--spotify-light-grey);">
+                    <i class="far fa-bell"></i>
+                    <i class="fas fa-users"></i>
+                    <div class="profile-container">
+                        <div class="profile-trigger" onclick="toggleDropdown(event)" style="width: 32px; height: 32px; border-radius: 50%; background-color: #282828; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; cursor: pointer;">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="dropdown-menu" id="profile-dropdown">
+                            <a href="#" class="dropdown-item">Conta <i class="fas fa-external-link-alt"></i></a>
+                            <a href="#" class="dropdown-item">Perfil</a>
+                            <div style="height:1px; background:hsla(0,0%,100%,.1); margin:4px 0;"></div>
+                            <form action="{% url 'logout' %}" method="post" id="logout-form" style="display:none;">{% csrf_token %}</form>
+                            <a href="javascript:void(0)" onclick="document.getElementById('logout-form').submit();" class="dropdown-item">Sair</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'signup' %}" style="color: var(--spotify-light-grey); text-decoration: none; font-weight: 700;">Inscrever-se</a>
+                <button class="btn-pill btn-white" style="padding: 12px 32px;" onclick="location.href='{% url 'login' %}'">Entrar</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="layout-main">
+        <div class="sidebar-container">
+            <div style="padding: 12px 16px; color: var(--spotify-light-grey); font-weight: 700; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-book" style="font-size: 24px;"></i> Sua Biblioteca
+                <i class="fas fa-plus" style="margin-left: auto; cursor: pointer;"></i>
+            </div>
+            {% if user.is_authenticated %}
+                <div style="display: flex; gap: 8px; padding: 8px 16px;">
+                    <button class="btn-pill btn-outline" style="padding: 6px 12px; font-size: 12px;">Playlists</button>
+                    <button class="btn-pill btn-outline" style="padding: 6px 12px; font-size: 12px;">Artistas</button>
+                </div>
+                <div style="flex: 1; overflow-y: auto; padding: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 6px; cursor: pointer;">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #450af5, #c4efd9); border-radius: 4px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-heart"></i></div>
+                        <div><h4 style="margin:0; font-size:14px;">Músicas Curtidas</h4><p style="margin:0; font-size:12px; color:var(--spotify-light-grey);">Playlist • 15 músicas</p></div>
+                    </div>
+                </div>
+            {% else %}
+                <div style="background-color: #1e1e1e; padding: 16px 20px; border-radius: 8px; margin: 12px 8px;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 16px;">Crie sua primeira playlist</h3>
+                    <p style="margin: 0 0 20px 0; font-size: 14px;">É fácil, vamos te ajudar.</p>
+                    <button class="btn-pill btn-white" style="font-size: 14px;" onclick="location.href='{% url 'playlist_create' %}'">Criar playlist</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="right-sidebar">
+                <h2>Sol Loiro</h2>
+                <img src="https://picsum.photos/seed/default/300" id="right-img" style="width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover;">
+                <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+                    <div><h3 id="right-title" style="margin:0; font-size:24px;">Clandestino - Live</h3><p id="right-artist" style="margin:4px 0 0 0; color:var(--spotify-light-grey);">Tihuana</p></div>
+                    <i class="far fa-plus-square" style="font-size: 24px;"></i>
+                </div>
+                <div style="background-color: #242424; border-radius: 8px; padding: 16px; margin-top: 24px;">
+                    <h3 style="margin-top:0;">Sobre o artista</h3>
+                    <img src="https://picsum.photos/seed/artist/80" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:12px;">
+                    <h4 style="margin:0;">Tihuana <i class="fas fa-check-circle" style="color: #3d91f4;"></i></h4>
+                    <p style="font-size:14px; color:var(--spotify-light-grey);">705.992 ouvintes mensais</p>
+                    <button class="btn-pill btn-outline">Seguir</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="player-bar">
+        <div class="player-bar-left">
+            <img src="https://picsum.photos/seed/default/56" id="player-img" style="width: 56px; height: 56px; border-radius: 4px;">
+            <div><div id="player-title" style="font-size: 14px; font-weight: 700;">Clandestino - Live</div><div id="player-artist" style="font-size: 12px; color: var(--spotify-light-grey);">Tihuana</div></div>
+            <i class="far fa-heart" style="margin-left: 8px;"></i>
+        </div>
+        <div class="player-bar-center">
+            <div style="display: flex; align-items: center; gap: 24px; font-size: 18px;">
+                <i class="fas fa-random" style="font-size: 14px; color: var(--spotify-green);"></i>
+                <i class="fas fa-step-backward"></i>
+                <i class="fas fa-play-circle" style="font-size: 36px;"></i>
+                <i class="fas fa-step-forward"></i>
+                <i class="fas fa-redo" style="font-size: 14px; color: var(--spotify-light-grey);"></i>
+            </div>
+            <div style="width: 100%; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--spotify-light-grey);">
+                <span>0:01</span>
+                <div class="progress-container"><div class="progress-fill" style="width: 10%;"></div></div>
+                <span>5:34</span>
+            </div>
+        </div>
+        <div class="player-bar-right">
+            <i class="fas fa-list"></i><i class="fas fa-volume-up"></i>
+            <div style="width: 100px; height: 4px; background-color: #4d4d4d; border-radius: 2px;"><div style="width: 70%; height: 100%; background-color: white;"></div></div>
+        </div>
+    </div>
+</body>
+</html>

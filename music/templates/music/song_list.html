@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-padding">
+    <div class="section-header">
+        <h2>Músicas</h2>
+        <a href="{% url 'song_create' %}" class="btn-white" style="padding: 8px 24px; font-size: 12px;">ADICIONAR MÚSICA</a>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse; color: var(--spotify-light-grey);">
+            <thead>
+                <tr style="border-bottom: 1px solid #282828; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                    <th style="padding: 12px; width: 40px;">#</th>
+                    <th style="padding: 12px;">Título</th>
+                    <th style="padding: 12px;">Artista</th>
+                    <th style="padding: 12px;">Duração</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for song in songs %}
+                <tr class="song-row" style="cursor: pointer;" onclick="playSong('{{ song.title }}', '{{ song.artist.name }}', 'https://picsum.photos/seed/song{{ song.id }}/300')">
+                    <td style="padding: 12px;">{{ forloop.counter }}</td>
+                    <td style="padding: 12px; color: white; font-weight: 500;">{{ song.title }}</td>
+                    <td style="padding: 12px;">{{ song.artist.name }}</td>
+                    <td style="padding: 12px;">{{ song.duration }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="padding: 40px; text-align: center;">Nenhuma música encontrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .song-row:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+    .song-row:hover td {
+        color: white !important;
+    }
+</style>
+{% endblock %}

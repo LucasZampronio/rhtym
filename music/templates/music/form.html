@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-padding">
+    <div class="section-header">
+        <h2>{{ title }}</h2>
+    </div>
+
+    <div style="background-color: var(--spotify-dark-grey); padding: 32px; border-radius: 8px; max-width: 600px;">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; color: white;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: #ff4d4d; font-size: 12px; margin-top: 4px;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div style="margin-top: 32px; display: flex; gap: 16px; align-items: center;">
+                <button type="submit" class="btn-white">Salvar</button>
+                <a href="javascript:history.back()" style="color: var(--spotify-light-grey); text-decoration: none; font-weight: 700; font-size: 14px;">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        padding: 14px;
+        background-color: #3e3e3e;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: white;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: 2px solid white;
+        background-color: #4e4e4e;
+    }
+</style>
+{% endblock %}

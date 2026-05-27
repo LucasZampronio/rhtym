@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Minhas Playlists</h1>
+<a href="{% url 'playlist_create' %}" class="btn">Nova Playlist</a>
+<ul>
+    {% for playlist in playlists %}
+        <li><strong>{{ playlist.name }}</strong> - {{ playlist.songs.count }} músicas</li>
+    {% empty %}
+        <li>Você ainda não tem playlists.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

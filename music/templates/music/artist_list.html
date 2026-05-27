@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content-padding">
+    <div class="section-header">
+        <h2>Artistas</h2>
+        <a href="{% url 'artist_create' %}" class="btn-white" style="padding: 8px 24px; font-size: 12px;">ADICIONAR ARTISTA</a>
+    </div>
+
+    <div class="card-grid">
+        {% for artist in artists %}
+        <div class="card" style="text-align: center;">
+            <img src="https://picsum.photos/seed/artist{{ artist.id }}/200" alt="{{ artist.name }}" style="border-radius: 50%;">
+            <h3>{{ artist.name }}</h3>
+            <p>Artista</p>
+            <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px;">
+                <a href="{% url 'artist_update' artist.pk %}" style="font-size: 12px; color: var(--spotify-light-grey); text-decoration: none;">Editar</a>
+                <a href="{% url 'artist_delete' artist.pk %}" style="font-size: 12px; color: #ffa4a4; text-decoration: none;">Excluir</a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="color: var(--spotify-light-grey);">Nenhum artista cadastrado.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
