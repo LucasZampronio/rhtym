@@ -31,7 +31,7 @@ def artist_list(request):
 @login_required
 def artist_create(request):
     if request.method == 'POST':
-        form = ArtistForm(request.POST)
+        form = ArtistForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('artist_list')
@@ -43,7 +43,7 @@ def artist_create(request):
 def artist_update(request, pk):
     artist = get_object_or_404(Artist, pk=pk)
     if request.method == 'POST':
-        form = ArtistForm(request.POST, instance=artist)
+        form = ArtistForm(request.POST, request.FILES, instance=artist)
         if form.is_valid():
             form.save()
             return redirect('artist_list')
@@ -67,7 +67,7 @@ def song_list(request):
 @login_required
 def song_create(request):
     if request.method == 'POST':
-        form = SongForm(request.POST)
+        form = SongForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('song_list')

@@ -12,12 +12,14 @@
     <!-- Shortcuts Grid (Logado) -->
     <div class="shortcuts-grid">
         {% for song in songs|slice:":8" %}
-        {% with img_url=song.cover_image.url|default:"https://picsum.photos/seed/s"|add:song.id|add:"/300" %}
-        <div class="shortcut-card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/s{{ song.id }}/300{% endif %}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
-            <img src="{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/s{{ song.id }}/48{% endif %}" alt="">
+        <div class="shortcut-card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_image.url|default:'' }}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
+            {% if song.cover_image %}
+                <img src="{{ song.cover_image.url }}" alt="">
+            {% else %}
+                <div style="width: 48px; height: 48px; background-color: #333; flex-shrink: 0;"></div>
+            {% endif %}
             <span>{{ song.title }}</span>
         </div>
-        {% endwith %}
         {% endfor %}
     </div>
 
@@ -30,8 +32,12 @@
             <button class="nav-arrow nav-prev" onclick="scrollCarousel('saudade-grid', -1)"><i class="fas fa-chevron-left"></i></button>
             <div class="card-grid" id="saudade-grid">
                 {% for song in songs|slice:":12" %}
-                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/saudade{{ song.id }}/300{% endif %}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
-                    <img src="{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/saudade{{ song.id }}/300{% endif %}" alt="">
+                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_image.url|default:'' }}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
+                    {% if song.cover_image %}
+                        <img src="{{ song.cover_image.url }}" alt="">
+                    {% else %}
+                        <div style="width: 100%; aspect-ratio: 1; background-color: #333; border-radius: 6px; margin-bottom: 16px;"></div>
+                    {% endif %}
                     <div class="play-overlay"><i class="fas fa-play"></i></div>
                     <h3>{{ song.title }}</h3>
                     <p>{{ song.artist.name }}</p>
@@ -52,7 +58,7 @@
             <div class="card-grid" id="recentes-grid">
                 {% for artist in artists|slice:":12" %}
                 <div class="card">
-                    <img src="{% if artist.image %}{{ artist.image.url }}{% else %}https://picsum.photos/seed/recent{{ artist.id }}/300{% endif %}" alt="" style="border-radius: 50%;">
+                    <img {% if artist.image %}src="{{ artist.image.url }}"{% endif %} alt="" style="border-radius: 50%; background-color: #333;">
                     <div class="play-overlay"><i class="fas fa-play"></i></div>
                     <h3>{{ artist.name }}</h3>
                     <p>Artista</p>
@@ -74,8 +80,12 @@
             <button class="nav-arrow nav-prev" onclick="scrollCarousel('songs-alta', -1)"><i class="fas fa-chevron-left"></i></button>
             <div class="card-grid" id="songs-alta">
                 {% for song in songs|slice:":12" %}
-                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/song{{ song.id }}/300{% endif %}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
-                    <img src="{% if song.cover_image %}{{ song.cover_image.url }}{% else %}https://picsum.photos/seed/song{{ song.id }}/300{% endif %}" alt="">
+                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{{ song.cover_image.url|default:'' }}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
+                    {% if song.cover_image %}
+                        <img src="{{ song.cover_image.url }}" alt="">
+                    {% else %}
+                        <div style="width: 100%; aspect-ratio: 1; background-color: #333; border-radius: 6px; margin-bottom: 16px;"></div>
+                    {% endif %}
                     <div class="play-overlay"><i class="fas fa-play"></i></div>
                     <h3>{{ song.title }}</h3>
                     <p>{{ song.artist.name }}</p>
@@ -96,7 +106,7 @@
             <div class="card-grid" id="artists-pop">
                 {% for artist in artists|slice:":12" %}
                 <div class="card">
-                    <img src="{% if artist.image %}{{ artist.image.url }}{% else %}https://picsum.photos/seed/artist{{ artist.id }}/300{% endif %}" alt="" style="border-radius: 50%;">
+                    <img {% if artist.image %}src="{{ artist.image.url }}"{% endif %} alt="" style="border-radius: 50%; background-color: #333;">
                     <div class="play-overlay" style="bottom: 80px;"><i class="fas fa-play"></i></div>
                     <h3>{{ artist.name }}</h3>
                     <p>Artista</p>

@@ -9,7 +9,7 @@
     <div class="card-grid">
         {% for artist in artists %}
         <div class="card" style="text-align: center;">
-            <img src="https://picsum.photos/seed/artist{{ artist.id }}/200" alt="{{ artist.name }}" style="border-radius: 50%;">
+            <img {% if artist.image %}src="{{ artist.image.url }}"{% endif %} alt="{{ artist.name }}" style="border-radius: 50%; background-color: #333;">
             <h3>{{ artist.name }}</h3>
             <p>Artista</p>
             <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px;">

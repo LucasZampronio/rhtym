@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Updated for root placement:
+BASE_DIR = Path(__file__).resolve().parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,7 +54,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'spotify_clone.urls'
+# Updated for root placement:
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
@@ -73,7 +75,8 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
-WSGI_APPLICATION = 'spotify_clone.wsgi.application'
+# Updated for root placement:
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database

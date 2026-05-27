@@ -18,7 +18,7 @@
             </thead>
             <tbody>
                 {% for song in songs %}
-                <tr class="song-row" style="cursor: pointer;" onclick="playSong('{{ song.title }}', '{{ song.artist.name }}', 'https://picsum.photos/seed/song{{ song.id }}/300')">
+                <tr class="song-row" style="cursor: pointer;" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', '{% if song.cover_image %}{{ song.cover_image.url }}{% endif %}', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
                     <td style="padding: 12px;">{{ forloop.counter }}</td>
                     <td style="padding: 12px; color: white; font-weight: 500;">{{ song.title }}</td>
                     <td style="padding: 12px;">{{ song.artist.name }}</td>
