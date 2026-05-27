@@ -14,6 +14,7 @@ class Artist(models.Model):
     name = models.CharField(max_length=100)
     genre = models.CharField(max_length=50)
     bio = models.TextField(blank=True)
+    image = models.ImageField(upload_to='artists/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -28,6 +29,7 @@ class Song(models.Model):
     title = models.CharField(max_length=200)
     duration = models.DurationField()
     audio_file = models.FileField(upload_to='songs/', null=True, blank=True)
+    cover_image = models.ImageField(upload_to='covers/', null=True, blank=True)
     # Requisito: Pelo menos 2 relacionamentos entre os modelos. (1/2)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='songs')
     release_date = models.DateField()
