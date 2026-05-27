@@ -12,7 +12,7 @@
     <!-- Shortcuts Grid (Logado) -->
     <div class="shortcuts-grid">
         {% for song in songs|slice:":8" %}
-        <div class="shortcut-card" onclick="playSong('{{ song.title }}', '{{ song.artist.name }}', 'https://picsum.photos/seed/s{{ song.id }}/300')">
+        <div class="shortcut-card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', 'https://picsum.photos/seed/s{{ song.id }}/300', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
             <img src="https://picsum.photos/seed/s{{ song.id }}/48" alt="">
             <span>{{ song.title }}</span>
         </div>
@@ -28,7 +28,7 @@
             <button class="nav-arrow nav-prev" onclick="scrollCarousel('saudade-grid', -1)"><i class="fas fa-chevron-left"></i></button>
             <div class="card-grid" id="saudade-grid">
                 {% for song in songs|slice:":12" %}
-                <div class="card" onclick="playSong('{{ song.title }}', '{{ song.artist.name }}', 'https://picsum.photos/seed/saudade{{ song.id }}/300')">
+                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', 'https://picsum.photos/seed/saudade{{ song.id }}/300', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
                     <img src="https://picsum.photos/seed/saudade{{ song.id }}/300" alt="">
                     <div class="play-overlay"><i class="fas fa-play"></i></div>
                     <h3>{{ song.title }}</h3>
@@ -51,7 +51,7 @@
                 {% for artist in artists|slice:":12" %}
                 <div class="card">
                     <img src="https://picsum.photos/seed/recent{{ artist.id }}/300" alt="" style="border-radius: 50%;">
-                    <div class="play-overlay"><i class="fas fa-play"></i></div>
+                    <div class="play-overlay" style="bottom: 80px;"><i class="fas fa-play"></i></div>
                     <h3>{{ artist.name }}</h3>
                     <p>Artista</p>
                 </div>
@@ -72,7 +72,7 @@
             <button class="nav-arrow nav-prev" onclick="scrollCarousel('songs-alta', -1)"><i class="fas fa-chevron-left"></i></button>
             <div class="card-grid" id="songs-alta">
                 {% for song in songs|slice:":12" %}
-                <div class="card" onclick="playSong('{{ song.title }}', '{{ song.artist.name }}', 'https://picsum.photos/seed/song{{ song.id }}/300')">
+                <div class="card" onclick="playSong('{{ song.title|escapejs }}', '{{ song.artist.name|escapejs }}', 'https://picsum.photos/seed/song{{ song.id }}/300', '{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}')">
                     <img src="https://picsum.photos/seed/song{{ song.id }}/300" alt="">
                     <div class="play-overlay"><i class="fas fa-play"></i></div>
                     <h3>{{ song.title }}</h3>
@@ -106,4 +106,24 @@
     </div>
     {% endif %}
 </div>
+<script>
+    // Inicializar a fila de reprodução global
+    window.songQueue = [
+        {% for song in songs %}
+        {
+            title: "{{ song.title|escapejs }}",
+            artist: "{{ song.artist.name|escapejs }}",
+            imgUrl: "https://picsum.photos/seed/song{{ song.id }}/300",
+            audioUrl: "{% if song.audio_file %}{{ song.audio_file.url }}{% endif %}"
+        },
+        {% endfor %}
+    ];
+
+    function scrollCarousel(id, direction) {
+        const carousel = document.getElementById(id);
+        if(carousel) {
+            carousel.scrollBy({ left: direction * carousel.offsetWidth * 0.8, behavior: 'smooth' });
+        }
+    }
+</script>
 {% endblock %}
